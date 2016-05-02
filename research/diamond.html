@@ -34,29 +34,34 @@
 		
 		function getTemplate() {
 			
-			
+			const renderer = new Diamond.Renderer();
+
 			const p1 = bound.property( 'checked', { ref: 'done' } );
 			const p2 = bound.property( 'value', { ref: 'name' } );
 	
-			const s1 = bound( { type: 'for', ref: 'items' }, {
-				fragment: document.getElementById('todo').content.cloneNode( true ),
-				bindings ( node ) {
-					var li = node.children[0];
-					return [
-						{ node: li.children[0].children[0], binding: p1 },
-						{ node: li.children[1], binding: p2 }
-					];	
-				}
-			});
+			const s1 = bound.section( { type: 'for', ref: 'items' }, 
+				renderer.compile({
+					fragment: document.getElementById('todo').content.cloneNode( true ),
+					bindings: [ p1, p2 ],
+					getNodes ( node ) {
+						var li = node.children[0];
+						return [
+							li.children[0].children[0],
+							li.children[1],
+						];	
+					}
+				})
+			);
 
-			return {
+			return renderer.compile({
 				fragment: $tatic([ s1.node() ]),
-				bindings ( node ) {
+				bindings: [ s1 ],
+				getNodes ( node ) {
 					return [
-						{ node: node.childNodes[0], binding: s1 }
+						node.childNodes[0],
 					];
 				}
-			};
+			});
 		}
 		
 		console.time( 'render' );

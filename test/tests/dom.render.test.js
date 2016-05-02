@@ -11,24 +11,27 @@ const { $tatic, bound } = Diamond.dom;
 
 test( 'elements and text', t => {
 	
+	const renderer = new Diamond.Renderer();
+	
 	const t1 = bound.text({ ref: 'foo' });
 	const t2 = bound.text({ ref: 'bar' });
 	
-	const template = {
-		fragment: $tatic([
+	const template = renderer.compile({
+		fragment: $tatic.section([
 			$tatic.el( 'div', null, [
 				$tatic.el( 'span', null, [ t1.node() ] ),
 				$tatic.el( 'span', null, [ $tatic.text( 'label: ' ), t2 ] )
 			])
 		]),
-		bindings ( node ) {
+		bindings: [ t1, t2 ],
+		getNodes ( node ) {
 			const div = node.children[0];
 			return [
-				{ node: div.children[0].childNodes[0], binding: t1 },
-				{ node: div.children[1].childNodes[1], binding: t2 }
+				div.children[0].childNodes[0],
+				div.children[1].childNodes[1]
 			];
 		}
-	};
+	});
 	
 	new Diamond( { 
 		template, 
@@ -41,18 +44,21 @@ test( 'elements and text', t => {
 
 test( 'static section', t => {
 	
+	const renderer = new Diamond.Renderer();
+
 	const t1 = bound.text({ ref: 'foo' });
 	
-	const template = {
-		fragment: $tatic([
+	const template = renderer.compile({
+		fragment: $tatic.section([
 			$tatic.el( 'div', null, [ t1.node() ] )
 		]),
-		bindings ( node ) {
+		bindings: [ t1 ],
+		getNodes ( node ) {
 			return [
-				{ node: node.children[0].childNodes[0], binding: t1 }
+				node.children[0].childNodes[0]
 			];
 		}
-	};
+	});
 	
 	new Diamond( { 
 		template, 
@@ -65,24 +71,30 @@ test( 'static section', t => {
 
 test( '#for section', t => {
 	
+	const renderer = new Diamond.Renderer();
+
 	const t1 = bound.text( { ref: '.' } );
-	const s1 = bound.section( { type: 'for', ref: 'items' }, {
-		fragment: $tatic( [ $tatic.el( 'li', null, [ t1 ] ) ] ),
-		bindings ( node ) {
+	const s1 = bound.section( { type: 'for', ref: 'items' }, 
+		renderer.compile({
+			fragment: $tatic.section( [ $tatic.el( 'li', null, [ t1 ] ) ] ),
+			bindings: [ t1 ],
+			getNodes ( node ) {
+				return [
+					node.children[0].childNodes[0]
+				];
+			}
+		})
+	);
+	
+	const template = renderer.compile({
+		fragment: $tatic.section([ s1.node() ]),
+		bindings: [ s1 ],
+		getNodes ( node ) {
 			return [
-				{ node: node.children[0].childNodes[0], binding: t1 }
+				node.childNodes[0]
 			];
 		}
 	});
-	
-	const template = {
-		fragment: $tatic([ s1.node() ]),
-		bindings ( node ) {
-			return [
-				{ node: node.childNodes[0], binding: s1 }
-			];
-		}
-	};
 	
 	new Diamond( { 
 		template, 
@@ -96,24 +108,30 @@ test( '#for section', t => {
 
 (function () {
 	
+	const renderer = new Diamond.Renderer();
+
 	const t1 = bound.text({ ref: 'foo' });
-	const s1 = bound.section( { type: 'if', ref: 'condition' }, {
-		fragment: $tatic( [ $tatic.el( 'li', null, [ t1.node() ] ) ] ),
-		bindings ( node ) {
-			return [
-				{ node: node.children[0].childNodes[0], binding: t1 }
-			];
-		}
-	})
+	const s1 = bound.section( { type: 'if', ref: 'condition' }, 
+		renderer.compile({
+			fragment: $tatic.section( [ $tatic.el( 'li', null, [ t1.node() ] ) ] ),
+			bindings: [ t1 ],
+			getNodes ( node ) {
+				return [
+					node.children[0].childNodes[0]
+				];
+			}
+		})
+	);
 	
-	const template = {
-		fragment: $tatic([ s1.node() ]),
-		bindings ( node ) {
+	const template = renderer.compile({
+		fragment: $tatic.section([ s1.node() ]),
+		bindings: [ s1 ],
+		getNodes ( node ) {
 			return [
-				{ node: node.childNodes[0], binding: s1 }
+				node.childNodes[0]
 			];
 		}
-	};
+	});
 		
 	test( '#if section true', t => {
 		new Diamond( { 
@@ -138,28 +156,34 @@ test( '#for section', t => {
 
 (function () {
 	
+	const renderer = new Diamond.Renderer();
+
 	const t1 = bound.text({ ref: 'a' });
 	const t2 = bound.text({ ref: 'b' });
 	
-	const s1 = bound.section( { type: 'with', ref: 'obj' }, {
-		fragment: $tatic( [ $tatic.el( 'p', null, [ t1, t2 ] ) ] ),
-		bindings ( node ) {
-			var p = node.children[0];
-			return [
-				{ node: p.childNodes[0], binding: t1 },
-				{ node: p.childNodes[1], binding: t2 }
-			];
-		}
-	})
+	const s1 = bound.section( { type: 'with', ref: 'obj' }, 
+		renderer.compile({
+			fragment: $tatic.section( [ $tatic.el( 'p', null, [ t1, t2 ] ) ] ),
+			bindings: [ t1, t2 ],
+			getNodes ( node ) {
+				var p = node.children[0];
+				return [
+					p.childNodes[0],
+					p.childNodes[1]
+				];
+			}
+		})
+	);
 	
-	const template = {
-		fragment: $tatic([ s1.node() ]),
-		bindings ( node ) {
+	const template = renderer.compile({
+		fragment: $tatic.section([ s1.node() ]),
+		bindings: [ s1 ],
+		getNodes ( node ) {
 			return [
-				{ node: node.childNodes[0], binding: s1 }
+				node.childNodes[0]
 			];
 		}
-	};
+	});
 		
 	test( '#with section', t => {
 		new Diamond( { 

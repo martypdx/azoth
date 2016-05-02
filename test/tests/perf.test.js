@@ -35,42 +35,48 @@ test( `jsBlocks 12 column table with ${count} rows < ${treshhold}ms`, t => {
 	}
 	const start = performance.now();
 	
+	const renderer = new Diamond.Renderer();
+
 	const bindings = columns.map( ref => bound.text({ ref }) );
 	const tds = bindings.map( b => $tatic.el( 'td', null, [ b.node() ] ) );
 	
-	const s1 = bound( { type: 'for', ref: 'items' }, {
-		fragment: $tatic([
-			$tatic.el( 'tr', null, tds ) 
-		]),
-		bindings ( node ) {
-			var tr = node.children[0];
-			return [
-				{ node: tr.children[0].childNodes[0], binding: bindings[0] },
-				{ node: tr.children[1].childNodes[0], binding: bindings[1] },
-				{ node: tr.children[2].childNodes[0], binding: bindings[2] },
-				{ node: tr.children[3].childNodes[0], binding: bindings[3] },
-				{ node: tr.children[4].childNodes[0], binding: bindings[4] },
-				{ node: tr.children[5].childNodes[0], binding: bindings[5] },
-				{ node: tr.children[6].childNodes[0], binding: bindings[6] },
-				{ node: tr.children[7].childNodes[0], binding: bindings[7] },
-				{ node: tr.children[8].childNodes[0], binding: bindings[8] },
-				{ node: tr.children[9].childNodes[0], binding: bindings[9] },
-				{ node: tr.children[10].childNodes[0], binding: bindings[10] },
-				{ node: tr.children[11].childNodes[0], binding: bindings[11] }
-			];
-		}
-	});
+	const s1 = bound( { type: 'for', ref: 'items' }, 
+		renderer.compile({
+			fragment: $tatic([
+				$tatic.el( 'tr', null, tds ) 
+			]),
+			bindings,
+			getNodes ( node ) {
+				var tr = node.children[0];
+				return [
+					tr.children[0].childNodes[0],
+					tr.children[1].childNodes[0],
+					tr.children[2].childNodes[0],
+					tr.children[3].childNodes[0],
+					tr.children[4].childNodes[0],
+					tr.children[5].childNodes[0],
+					tr.children[6].childNodes[0],
+					tr.children[7].childNodes[0],
+					tr.children[8].childNodes[0],
+					tr.children[9].childNodes[0],
+					tr.children[10].childNodes[0],
+					tr.children[11].childNodes[0],
+				];
+			}
+		})
+	);
 	
-	const template = {
+	const template = renderer.compile({
 		fragment: $tatic([
 			$tatic.el( 'table', null, [ s1.node() ])
 		]),
-		bindings ( node ) {
+		bindings: [ s1 ],
+		getNodes ( node ) {
 			return [
-				{ node: node.children[0].childNodes[0], binding: s1 }
+				node.children[0].childNodes[0]
 			];
 		}
-	};
+	});
 	
 	new Diamond( { 
 		template, 
@@ -91,28 +97,34 @@ test( `mithril 150 simple items`, t => {
 	
 	const start = performance.now();
 	
+	const renderer = new Diamond.Renderer();
+
 	const t1 = bound.text({ ref: 'name' });
-	const s1 = bound( { type: 'for', ref: 'items' }, {
-		fragment: $tatic([
-			$tatic.el( 'span', null, [ t1.node() ]) 
-		]),
-		bindings ( node ) {
-			return [
-				{ node: node.children[0].childNodes[0], binding: t1 }
-			];
-		}
-	});
+	const s1 = bound( { type: 'for', ref: 'items' }, 
+		renderer.compile({
+			fragment: $tatic([
+				$tatic.el( 'span', null, [ t1.node() ]) 
+			]),
+			bindings: [ t1 ],
+			getNodes ( node ) {
+				return [
+					node.children[0].childNodes[0]
+				];
+			}
+		})
+	);
 	
-	const template = {
+	const template = renderer.compile({
 		fragment: $tatic([
 			$tatic([ s1.node() ])
 		]),
-		bindings ( node ) {
+		bindings: [ s1 ],
+		getNodes ( node ) {
 			return [
-				{ node: node.childNodes[0], binding: s1 }
+				node.childNodes[0]
 			];
 		}
-	};
+	});
 	
 	new Diamond( { 
 		template, 

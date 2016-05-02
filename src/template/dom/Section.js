@@ -8,7 +8,7 @@ export default class Section {
 	constructor ( binding, template ) {
 		this.binding = binding;
 		
-		this.template = new DOMTemplate( template );
+		this.template = template;
 		
 		const Block = blocks[ binding.type ];
 		
@@ -23,11 +23,13 @@ export default class Section {
 	
 	bind ( context, anchor ) {
 		const template = this.template;
+		const renderer = this.template.renderer;
 		
 		function add( addContext ) {
-			const { queue, node } = template.render();
-			bind( queue, addContext );
-			anchor.parentNode.insertBefore( node, anchor );
+			renderer.enqueue( () => {
+				const node = template.render( addContext );
+				anchor.parentNode.insertBefore( node, anchor );
+			});
 		}
 		
 		this.block.bind( context, this.binding, add );
