@@ -25,8 +25,10 @@ export function makeHtml( html ) {
 	return makeDiv( html ).innerHTML;
 }
 
-// http://www.sitepoint.com/removing-useless-nodes-from-the-dom/
-// TODO: get node type code
+// originally: http://www.sitepoint.com/removing-useless-nodes-from-the-dom/
+// modified to only trim
+// TODO: could string just be trimmed? or does live parse need it?
+// TODO: get node type code from dom
 export function clean(node)
 {
 	for( var n = 0, child; n < node.childNodes.length; n++ ) {

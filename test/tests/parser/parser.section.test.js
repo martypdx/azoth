@@ -6,7 +6,11 @@ module( 'parser', () => {
 	module( 'section' );
 	
 	test( 'splits bindings', t => {
-		t.deepEqual( parser( '<ul>{{#for items}}<li>{{.}}</li>{{/for}}</ul>' ), {
+		t.deepEqual( parser( `
+			<ul><# items.map( item => {
+				<li>{{item}}</li>
+			})#></ul>` 
+		), {
 			html: '<ul data-bind><section-node></section-node></ul>',
 			defs: [{
 				binder: 'section', type: 'for', ref: 'items',

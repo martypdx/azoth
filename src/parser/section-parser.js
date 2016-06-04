@@ -1,7 +1,7 @@
 import { getPosition, addBinding } from './domUtil';
 
-const mustacheBrackets = /[{{|}}]/g;
-const sectionMustache = /({{[#\/].+?}})/g;
+const sectionBrackets = /(<#.+?.map\(.+?=>\s+?{\s*)|(#>)/g;
+const mapping = /.map\(.*?{$/g
 
 const sectionElName = 'section-node';
 const tempName = 'temp-name';
@@ -10,26 +10,30 @@ export default function getSectionParser( BINDING_ATTR ) {
 	return {
 		replace( html, hash ) {
 			var i = 0;
-			return html.replace( sectionMustache, match => {
-				const name = `s${i++}`;
-				const words = match
-					.replace( mustacheBrackets, '' )
-					.trim()
-					.split( ' ' );
-					
-				const first = words.shift();
-				var replace = '';
-				if ( first[0] === '#' ) {
-					const type = first.slice(1);
-					const ref = words.join( ' ' );
-					hash[ name ] = { type, ref, binder: 'section' };
-					replace = `<${sectionElName} ${tempName}="${name}">`;
-				}
-				else {
-					replace = `</${sectionElName}>`;	
-				}
+			return html.replace( sectionBrackets, match => {
+				console.log( match )
+				if ( match[0] === '#' ) return`</${sectionElName}>`;
 				
-				return replace;
+				const name = `s${i++}`;
+				const ref = match.trim().replace( mapping, match => {
+					console.log( match );
+					return '';	
+				});
+				
+				console.log(ref);
+					
+				// const first = words.shift();
+				// var replace = '';
+				// if ( first[0] === '#' ) {
+				// 	const type = first.slice(1);
+				// 	const ref = words.join( ' ' );
+				// 	hash[ name ] = { type, ref, binder: 'section' };
+				// 	replace = `<${sectionElName} ${tempName}="${name}">`;
+				// }
+				// else {
+				// }
+				
+				// return replace;
 			});
 		},
 		make( host, template, makeBindings ) {
