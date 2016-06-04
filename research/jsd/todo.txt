@@ -1,0 +1,100 @@
+
+
+class Todos {
+	
+	render( todos ) {
+		return <ul>
+			<# todos.map( ( todo, i ) => {
+				<li>
+					<todo(todo) on-delete="() => todos.splice( i, 1 )"/>
+				</li>
+			}) #>
+			<li>
+				<add-new on-add="task => todos.push({ task })"/>
+			</li>
+		</ul>
+	}
+}
+
+function make {
+
+	return ( { task, done } ) => {
+		let editing = false;
+		<div>
+			<input type="checkbox" value=done>
+			<#when ( editing ) {
+				<input value=task 
+					   on-render="({node}) => node.focus()"
+					   on-blur="() => editing = false">
+			}#else {
+				<label class-done=done 
+					   on-click="() => editing = true">
+					<# task #>
+				</label>
+			}#>
+		</div>;
+	}
+	
+}
+
+	make({ template, bindings, data, state }) {
+		const template = `<div>
+			<input type="checkbox" data-bind>
+			<section-node></section-node>
+		<div>`;
+		const task = data.create( 'task' );
+		const done = data.create( 'done' );
+		const editing = state.create( 'editing', false );
+		bindings[0] = bound.property( 'value', done );
+		bindings[1] = bound.section( 'when', editing, {
+				template: `<input data-bind>`,
+				makeBindings( bindings ) => {
+					const b0 = bound.event( 'render', ({node}) => node.focus() );
+					const b1 = bound.event( 'blur', () => editing.set( true ) );
+					bindings[0] = ( context, node ) => {
+						b0( context, node );
+						b1( context, node );
+					};
+				}
+			}, {
+				template: `<label class="" data-bind></label>`,
+				makeBindings( bindings ) => {
+					const b0 = bound.class( 'done', done );
+					const b1 = bound.text( task );
+					bindings[0] = ( context, node ) => {
+						b0( context, node );
+						b1( context, node );
+					};
+				}
+			}
+		);
+		
+		<div>
+			<input type="checkbox" data-bind>
+			<section-node></section-node>
+		<div>
+			}#else {
+				<label class-done=done 
+					   on-click="() => editing = true">
+					<# task #>
+				</label>
+			}#>
+		</div>;
+	}
+
+class AddNew {
+	render( newItem = '' ) {
+		
+		let newItem = '';
+		
+		return <form onsubmit="return false;"
+		    on-submit=() => {
+			  	this.fire( 'add', newItem.trim() );
+				newItem = '';
+			}>
+			
+			<input value=newItem>
+			<button type="submit">add</button>
+		</form>;
+	}
+}

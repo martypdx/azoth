@@ -1,0 +1,48 @@
+
+
+<!-- Todos -->
+	
+	{{#with todos = . }}
+		<ul>
+			{{#each (todo, i) in todos}}
+				<li>
+					<todo todo="{{todo}}" on-delete="() => todos.splice( i, 1 )"/>
+				</li>
+			{{/each}}
+			<li>
+				<add-new on-add="task => todos.push({ task })"/>
+			</li>
+		</ul>
+	{{/with}}
+
+
+<!-- Todo -->
+	{{#const { task, done } = . }}
+		<div>
+			<input type="checkbox" value="done">
+			{{#if this.editing }}
+				<input value="{{task}}" 
+					   on-render="node => node.focus()"
+					   on-blur="() => this.editing = false">
+			{{else}}
+				<label on-click="() => this.editing = true">{{task}}</label>
+			{{/if}}
+		</div>
+	{{/const}}
+}
+
+
+<!-- add-new -->
+	{{#with .|'' as newItem}}
+		<form onsubmit="return false"
+		      on-submit="() => this.fire( 'add', newItem.trim() )" >
+			<input value="{{newItem}}">
+			<button type="submit">add</button>
+		</form>
+	{{/with}}
+	
+<!-- post -->
+	{{#with . as post}} 
+	
+	{{/with}}
+

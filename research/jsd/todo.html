@@ -1,0 +1,52 @@
+
+
+<!-- Todos -->
+	
+	<# ( { todos } ) => {
+		<ul>
+			<#todos.map( ( todo, i ) => {
+				<li>
+					<todo(todo) on-delete="() => todos.splice( i, 1 )"/>
+				</li>
+			})#>
+			<li>
+				<add-new on-add="task => todos.push({ task })"/>
+			</li>
+		</ul>
+	}#>
+
+
+<!-- Todo -->
+	<# todo => {
+		<div>
+			<input type="checkbox" value(todo.done)>
+			<#if ( this.editing ) {
+				<input class="edit-task"
+					   value( todo.task ) 
+					   on-render="node => node.focus()"
+					   on-blur="() => this.editing = false">
+			}
+			else {
+				<label on-click="() => this.editing = true">${todo.task}</label>
+			}#>
+		</div>
+	}#>
+}
+
+
+<!-- add-new -->
+	<# ( newItem = '' ) => { 
+		<form onsubmit="return false"
+		      on-submit="() => this.fire( 'add', newItem.trim() )" >
+			<input value( newItem )>
+			<button type="submit">add</button>
+		</form>
+	}#>
+	
+<!-- post -->
+	<# post => { 
+		<# ( { user, content } ) => {
+		
+		}( post )
+	}#>
+
