@@ -1,0 +1,44 @@
+
+const greeting = name => _`
+    <div>
+        Hello <span>${@name}</span>
+    </div>
+`;
+
+const numberInput = n => _`
+    <input type="number" value=${@n} onchange=${({ target }) => n.next(target.value)}>
+`;
+
+const add = (x, y) => _`
+    <div>
+        <span>
+            ${numberInput(x)} + ${numberInput(x)}
+        </span>
+        <span>
+            ${@x + @y}
+        </span>
+    </div>
+`;
+
+
+/* Overlay */
+
+// elements
+
+const Colors = colors => _`
+    <ul>
+        <#:${Overlay(colors)} map=${Color}/>
+    </ul>
+`;
+
+const Color = color => _`<li>${@color}</li>`;
+
+const colors = new ObservableArray(['red', 'yellow', 'blue']);
+
+document.body.appendChild(Colors(colors))
+
+// text nodes
+
+ const template = colors => _`
+    <#:${Overlay(colors)} map=${(color, i) => _`${i + 1} - ${@color};`}/>
+`;

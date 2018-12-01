@@ -15,12 +15,12 @@ module('Core Block Operations', hooks => {
         fixture.appendChild(anchor);
     });
 
-    module('adds', hooks => {
+    let block = null;
 
-        let block = null;
-
-        hooks.beforeEach(() => block = new CoreBlock({ anchor }));
-        hooks.afterEach(() => block.unsubscribe());
+    hooks.beforeEach(() => block = new CoreBlock({ anchor }));
+    hooks.afterEach(() => block.unsubscribe());
+    
+    module('adds', () => {
         
         test('by value', t => {
             block.map = color => _`<span>${color}</span>`;
@@ -91,11 +91,6 @@ module('Core Block Operations', hooks => {
 
     module('clear', () => {
 
-        let block = null;
-
-        hooks.beforeEach(() => block = new CoreBlock({ anchor }));
-        hooks.afterEach(() => block.unsubscribe());
-
         function testClear(name, map) {
             test(`${name} cleared with no siblings`, t => {
                 block.map = map;
@@ -127,12 +122,7 @@ module('Core Block Operations', hooks => {
         
     });
 
-    module('removeAt', hooks => {
-
-        let block = null;
-
-        hooks.beforeEach(() => block = new CoreBlock({ anchor }));
-        hooks.afterEach(() => block.unsubscribe());
+    module('removeAt', () => {
 
         test('removes top-level DOM based on index', t => {
             block.map = color => _`<span>${color}</span>`;
@@ -170,12 +160,7 @@ module('Core Block Operations', hooks => {
     });
 
 
-    module('adds at index', hooks => {
-
-        let block = null;
-
-        hooks.beforeEach(() => block = new CoreBlock({ anchor }));
-        hooks.afterEach(() => block.unsubscribe());
+    module('adds at index', () => {
         
         test('by value', t => {
             block.map = color => _`<li>${color}</li>`;
@@ -217,6 +202,66 @@ module('Core Block Operations', hooks => {
             block.add(true, 1);
             t.equal(fixture.cleanHTML(), 'onetwothreefouronetwo<!--block-->');
         });
+
+    });
+
+
+    module('adds by key', () => {
+        
+        test('by value', t => {
+            block.map = color => _`<li>${color}</li>`;
+
+            block.addByKey('blue');
+            block.addByKey('red', 'blue');
+            t.equal(fixture.cleanHTML(), '<li>red</li><li>blue</li><!--block-->');
+            // block.add('yellow', 1);
+            // t.equal(fixture.cleanHTML(), '<li>blue</li><li>yellow</li><li>red</li><!--block-->');
+        });
+
+        test('by key prop', t => {
+            block.map = (color=$) => _`<li>*${color.name}</li>`;
+            block.keyName = 'key';
+
+            const blue = new Observable({ key: 'B', name: 'blue' });
+            const red = new Observable({ key: 'R', name: 'red' });
+
+            block.addByKey(blue);
+            block.addByKey(red, 'B');
+            t.equal(fixture.cleanHTML(), '<li>red</li><li>blue</li><!--block-->');
+            // block.add('yellow', 1);
+            // t.equal(fixture.cleanHTML(), '<li>blue</li><li>yellow</li><li>red</li><!--block-->');
+        });
+
+        // test('multi-top-level nodes from map', t => {
+        //     block.map = ({ color, count }) => _`
+        //         <h3>${color}</h3>
+        //         <p>${count}</p>
+        //     `;
+
+        //     block.add({ color: 'blue', count: 4 });
+        //     block.add({ color: 'red', count: 3 });
+        //     t.contentEqual(fixture.cleanHTML(), '<h3>blue</h3><p>4</p><h3>red</h3><p>3</p><!--block-->');
+        //     block.add({ color: 'yellow', count: 2 }, 1);
+        //     t.contentEqual(fixture.cleanHTML(), '<h3>blue</h3><p>4</p><h3>yellow</h3><p>2</p><h3>red</h3><p>3</p><!--block-->');
+        // });
+
+        // test('function as map return', t => {
+        //     block.map = cool => cool ? _`<span>red</span>` : _`<span>blue</span>`;
+        //     block.add();
+        //     block.add();
+        //     t.equal(fixture.cleanHTML(), '<span>blue</span><span>blue</span><!--block-->');
+        //     block.add(true, 1);
+        //     t.equal(fixture.cleanHTML(), '<span>blue</span><span>red</span><span>blue</span><!--block-->');
+        // });
+
+        // test('array as map return', t => {
+        //     block.map = high => high ? [_`three`, _`four`] : [_`one`, _`two`];
+        //     block.add();
+        //     block.add();
+        //     t.equal(fixture.cleanHTML(), 'onetwoonetwo<!--block-->');
+        //     block.add(true, 1);
+        //     t.equal(fixture.cleanHTML(), 'onetwothreefouronetwo<!--block-->');
+        // });
 
     });
 });

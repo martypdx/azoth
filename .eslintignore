@@ -2,3 +2,4 @@
 node_modules
 dist
 tests/build
+new-syntax.js

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const testFile = /.test.js$/; 
+const testFile = /core.test.js$/; 
 const jsFile = /.js$/;
 const isTestFile = f => testFile.test(f); 
 const isNotJsFile = f => !jsFile.test(f);

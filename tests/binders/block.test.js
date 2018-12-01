@@ -49,7 +49,7 @@ module('block binder', () => {
         });
     });
 
-    test('sibling block binders', t => {
+    test('sibling block binders', () => {
         const div = val => _`<div>${val}</div>`;
 
         const template = (first=$, second=$) => _`*${div(first)}#-*${div(second)}#`;

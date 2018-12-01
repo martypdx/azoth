@@ -167,7 +167,7 @@ const template = (x=$, y=$) => _`*${x} + *${y} = *${x + y}`;
 const x = new BehaviorSubject(5);
 const y = new BehaviorSubject(2);
 
-document.body.appendChild(template(x, y));		
+document.body.appendChild(template(x, y));
 // 5 + 2 = 7
 
 x.next(3);

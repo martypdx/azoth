@@ -9,6 +9,7 @@
     "test:build": "rollup -c rollup/rollup.config.tests.js",
     "test:watch": "npm run test:build -- -w",
     "test": "run-p test:build test:serve",
+    "test:start": "run-p test:watch test:serve",
     "test:serve": "cd tests/build && live-server",
     "start": "run-p test:watch test:serve",
     "prebuild": "eslint src",
@@ -21,6 +22,7 @@
   "license": "MIT",
   "devDependencies": {
     "eslint": "^4.1.1",
+    "live-server": "^1.2.0",
     "npm-run-all": "^4.0.2",
     "qunit": "^1.0.0",
     "rollup": "^0.43.0",

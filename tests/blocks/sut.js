@@ -22,6 +22,10 @@ export default class Block {
         this._unsubscribes = null;
         this.unsubscribed = false;
 
+        // by key
+        this.dictionary = new Map();
+        this.keyName = '';
+
         // remove
         this._blocks = [];
     }
@@ -41,12 +45,7 @@ export default class Block {
         else this._unsubscribes = [this._unsubscribes, unsubscribe];
     }
 
-    // remove
-    _trackDOM(nodes) {
-        return this._blocks.push(nodes);  
-    }
-
-    _getFirstBlockNode(index = -1, blocks = this._blocks) {
+    _getFirstBlockNodeByIndex(index = -1, blocks = this._blocks) {
         if(index === -1 || index === null || index === undefined) {
             return this._anchor;
         }
@@ -54,22 +53,48 @@ export default class Block {
         const block = blocks[index];
         if(block === null || block === undefined) return this._anchor;
 
-        if(Array.isArray(block)) return this._getFirstBlockNode(0, block);
+        if(Array.isArray(block)) return this._getFirstBlockNodeByIndex(0, block);
+
+        const { nodes } = block;
+        return Array.isArray(nodes) ? nodes[0] : nodes;
+    }
+
+    _getFirstBlockNodeByKey(key) {
+        if(key === '' || key === null || key === undefined) {
+            return this._anchor;
+        }
+
+        const block = this.dictionary.get(key);  
+        if(block === null || block === undefined) return this._anchor;
+
+        if(Array.isArray(block)) return this._getFirstBlockNodeByIndex(0, block);
 
         const { nodes } = block;
         return Array.isArray(nodes) ? nodes[0] : nodes;
     }
 
     add(item, index = -1) {
+        const before = this._getFirstBlockNodeByIndex(index);
+        const nodes = this._doAdd(item, before);
+        // indexed remove
+        this._blocks.push(nodes);
+    }
+
+    addByKey(item, key) {
+        const before = this._getFirstBlockNodeByKey(key);
+        const nodes = this._doAdd(item, before);
+        // keyed remove
+        const ownKey = this.keyName ? item[this.keyName] : item;
+        this.dictionary.set(ownKey, nodes);
+    }
+        
+    _doAdd(item, before) {
         const { map } = this;
         if(!map) return; //TODO: warn, throw, ???
 
         const dom = map(item);
-        const before = this._getFirstBlockNode(index);
         
-        const nodes = this._insert(dom, before);
-        // remove
-        this._trackDOM(nodes);
+        return this._insert(dom, before);
     }
 
     _insert(dom, before) {
@@ -85,10 +110,10 @@ export default class Block {
         }
         else if(!(dom instanceof Node)) throwNoDOM(dom);
 
-        // remove
+        // add/remove, by index/key
         const { childNodes, unsubscribe } = dom;
         const nodes = childNodes.length > 1 ? [...childNodes] : childNodes[0];
-
+        
         // clear
         this._trackUnsubscribe(dom);
 
